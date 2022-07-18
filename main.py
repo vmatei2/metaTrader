@@ -1,3 +1,5 @@
+import time
+
 import ccxt
 import numpy as np
 import pandas as pd
@@ -21,8 +23,8 @@ kraken = ccxt.kraken({
     'apiKey': config.apiKey,
     'secret': config.secret
 })
-stop = 0
-# Fetching Data
+kraken.enableRateLimit = True  # stay under rate limit to avoid ban on exchange
+
 
 def fetch_data(ticker):
     global kraken
@@ -67,11 +69,38 @@ def get_trade_recommendation(ticker_df):
     return final_result
 
 
+def execute_trade(trade_rec_type, trading_ticker):
+    # have a look here for global variables - https://stackoverflow.com/questions/423379/using-global-variables-in-a
+    # -function
+    global kraken, HOLDING_QUANTITY
+    order_place = False
+    side_value = 'buy' if (trade_rec_type == "BUY") else "sell"
+    try:
+        ticker_price_response = kraken.fetch_trades(trading_ticker)[-1]  # -1 for getting latest trade executed
+        test = 0
+    except Exception as e:
+        print(e)
+
+
 def run_bot_for_ticker(ccxt_ticker, trading_ticker):
     currently_holding = False
     while 1:
         ticker_data = fetch_data(ccxt_ticker)
         if ticker_data is not None:
+            # STEP 2: Compute the technical indicators and apply the trading strategy
             trade_rec_type = get_trade_recommendation(ticker_data)
-            print(f'{datetime.now().strftime("%d/%m/%Y %H:%M:%S")}  TRADING RECOMMENDATION: {trade_rec_type}')
+            print(f'{datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")}  TRADING RECOMMENDATION: {trade_rec_type}')
 
+            # STEP 3:  Exeute the trade
+            if trade_rec_type == 'BUY' and not currently_holding or trade_rec_type == "SELL" and currently_holding:
+                trade_succesful = execute_trade(trade_rec_type, trading_ticker)
+                currently_holding = not currently_holding if trade_succesful else currently_holding
+            time.sleep(CANDLE_DURATION_IN_MIN * 60)
+        else:
+            print("Unable to fetch ticker data for ", ccxt_ticker)
+            print()
+            print("Retrying")
+            time.sleep(5)
+
+execute_trade(trade_rec_type="BUY", trading_ticker=CCXT_TICKER_NAME)
+# run_bot_for_ticker(ccxt_ticker=CCXT_TICKER_NAME, trading_ticker=TRADING_TICKER_NAME)
