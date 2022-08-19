@@ -4,7 +4,7 @@ import ccxt
 import numpy as np
 import pandas as pd
 import talib
-import datetime
+from datetime import datetime
 import config
 
 CANDLE_DURATION_IN_MIN = 5
@@ -73,13 +73,24 @@ def execute_trade(trade_rec_type, trading_ticker):
     # have a look here for global variables - https://stackoverflow.com/questions/423379/using-global-variables-in-a
     # -function
     global kraken, HOLDING_QUANTITY
-    order_place = False
+    order_placed = False
     side_value = 'buy' if (trade_rec_type == "BUY") else "sell"
     try:
         ticker_price_response = kraken.fetch_trades(trading_ticker)[-1]  # -1 for getting latest trade executed
+        latest_price = ticker_price_response['price']  # to check the validity of this data, manually go on Kraken -
+        # open a new buy order for the trading ticker provided and see how the "est. price" field updates
+        # ticker price response object has info list where the entries are: 1. price, 2. volume, 3.time, 4.buy/sell, 5.market/limit, 6.miscellanous
+        script_quantity = round(INVESTMENT_AMOUNT_DOLLARS/latest_price, 5) if trade_rec_type == "BUY" else HOLDING_QUANTITY
+        print(f"PLACING ORDER {datetime.now().strftime('%d/%m/%y %H:%M:%S')}: {trading_ticker}, {side_value}, {latest_price}, {script_quantity}, {int(time.time() * 1000)}")
+        order_response = kraken.create_order(symbol=trading_ticker, side=side_value, price=latest_price, amount=script_quantity, type="limit")
+        print(f"ORDER PLACED")
+        HOLDING_QUANTITY = script_quantity if trade_rec_type == "BUY" else HOLDING_QUANTITY
+        order_placed = True
         test = 0
     except Exception as e:
         print(e)
+
+    return order_placed
 
 
 def run_bot_for_ticker(ccxt_ticker, trading_ticker):
