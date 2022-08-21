@@ -69,7 +69,15 @@ def get_trade_recommendation(ticker_df):
     return final_result
 
 
-def execute_trade(trade_rec_type, trading_ticker):
+def find_minimum_order_volume():
+    global kraken
+    kraken.load_markets()
+    market = kraken.markets[CCXT_TICKER_NAME]
+    minimum_order_volume = market['limits']['amount']['min']
+    return minimum_order_volume
+
+
+def execute_trade(trade_rec_type, trading_ticker, minimum_volume):
     # have a look here for global variables - https://stackoverflow.com/questions/423379/using-global-variables-in-a
     # -function
     global kraken, HOLDING_QUANTITY
@@ -80,9 +88,14 @@ def execute_trade(trade_rec_type, trading_ticker):
         latest_price = ticker_price_response['price']  # to check the validity of this data, manually go on Kraken -
         # open a new buy order for the trading ticker provided and see how the "est. price" field updates
         # ticker price response object has info list where the entries are: 1. price, 2. volume, 3.time, 4.buy/sell, 5.market/limit, 6.miscellanous
-        script_quantity = round(INVESTMENT_AMOUNT_DOLLARS/latest_price, 5) if trade_rec_type == "BUY" else HOLDING_QUANTITY
-        print(f"PLACING ORDER {datetime.now().strftime('%d/%m/%y %H:%M:%S')}: {trading_ticker}, {side_value}, {latest_price}, {script_quantity}, {int(time.time() * 1000)}")
-        order_response = kraken.create_order(symbol=trading_ticker, side=side_value, price=latest_price, amount=script_quantity, type="limit")
+        script_quantity = round(INVESTMENT_AMOUNT_DOLLARS / latest_price,
+                                5) if trade_rec_type == "BUY" else HOLDING_QUANTITY
+        print(f"Script quantity calculated as {script_quantity}")
+        script_quantity = max(script_quantity, minimum_volume)
+        print(
+            f"PLACING ORDER {datetime.now().strftime('%d/%m/%y %H:%M:%S')}: {trading_ticker}, {side_value}, {latest_price}, {script_quantity}, {int(time.time() * 1000)}")
+        order_response = kraken.create_order(symbol=trading_ticker, side=side_value, price=latest_price,
+                                             amount=script_quantity, type="limit")
         print(f"ORDER PLACED")
         HOLDING_QUANTITY = script_quantity if trade_rec_type == "BUY" else HOLDING_QUANTITY
         order_placed = True
@@ -93,7 +106,7 @@ def execute_trade(trade_rec_type, trading_ticker):
     return order_placed
 
 
-def run_bot_for_ticker(ccxt_ticker, trading_ticker):
+def run_bot_for_ticker(ccxt_ticker, trading_ticker, minimum_volume):
     currently_holding = False
     while 1:
         ticker_data = fetch_data(ccxt_ticker)
@@ -104,7 +117,7 @@ def run_bot_for_ticker(ccxt_ticker, trading_ticker):
 
             # STEP 3:  Exeute the trade
             if trade_rec_type == 'BUY' and not currently_holding or trade_rec_type == "SELL" and currently_holding:
-                trade_succesful = execute_trade(trade_rec_type, trading_ticker)
+                trade_succesful = execute_trade(trade_rec_type, trading_ticker, minimum_volume)
                 currently_holding = not currently_holding if trade_succesful else currently_holding
             time.sleep(CANDLE_DURATION_IN_MIN * 60)
         else:
@@ -113,5 +126,7 @@ def run_bot_for_ticker(ccxt_ticker, trading_ticker):
             print("Retrying")
             time.sleep(5)
 
-execute_trade(trade_rec_type="BUY", trading_ticker=CCXT_TICKER_NAME)
+
+minimum_volume = find_minimum_order_volume()
+execute_trade(trade_rec_type="BUY", trading_ticker=CCXT_TICKER_NAME, minimum_volume=minimum_volume)
 # run_bot_for_ticker(ccxt_ticker=CCXT_TICKER_NAME, trading_ticker=TRADING_TICKER_NAME)
