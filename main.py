@@ -24,6 +24,7 @@ kraken = ccxt.kraken({
     'secret': config.secret
 })
 kraken.enableRateLimit = True  # stay under rate limit to avoid ban on exchange
+kraken.set_sandbox_mode(True)  # enabling sandbox mode to play around with ideas
 
 
 def fetch_data(ticker):
