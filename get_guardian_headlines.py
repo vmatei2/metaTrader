@@ -2,8 +2,10 @@ import datetime
 from datetime import timedelta
 import requests
 import pandas as pd
-import config
 
+import config
+from classes.Preprocessor import Preprocessing
+from helpers.visualisations import visualise_word_cloud
 
 MY_API_KEY = config.guardian_key
 API_ENDPOINT = config.guardian_endpoint
@@ -18,7 +20,8 @@ my_params = {
     'api-key': MY_API_KEY
 }
 
-def get_headlines(start_date, end_date):
+
+def get_headlines(start_date, end_date, pre_processor):
     dayrange = range((end_date - start_date).days + 1)
     page_titles_dict = {}
     all_dates = []
@@ -41,7 +44,8 @@ def get_headlines(start_date, end_date):
             response_results_dicts = data['response']['results']
             all_results.extend(response_results_dicts)
             for results_dict in response_results_dicts:
-                all_headlines.append(results_dict['webTitle'])
+                headline = pre_processor.pre_process_string(results_dict['webTitle'])
+                all_headlines.append(headline)
                 number_of_articles += 1
             # if there is more than one page of results
             current_page += 1
@@ -59,8 +63,12 @@ def create_df_from_dict(result_dict):
     results_df = pd.DataFrame.from_dict(result_dict)
     return results_df
 
-start_date = datetime.date(2022, 1, 1)
+
+
+
+start_date = datetime.date(2020, 1, 1)
 end_date = datetime.date.today()
-page_titles_dict = get_headlines(start_date, end_date)
+preprocessor = Preprocessing()
+page_titles_dict = get_headlines(start_date, end_date, preprocessor)
 results_df = create_df_from_dict(page_titles_dict)
-stop = 0
+visualise_word_cloud(results_df, 'Headline')
