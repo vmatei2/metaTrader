@@ -1,3 +1,6 @@
+from nltk.corpus import stopwords
+
+
 class Preprocessing:
     def __init__(self):
-        stopwords = "path to stopwords"
+        self.stopwords_en = set(stopwords.words('english'))
