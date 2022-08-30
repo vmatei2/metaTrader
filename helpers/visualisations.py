@@ -3,6 +3,8 @@ from wordcloud import ImageColorGenerator
 from wordcloud import STOPWORDS
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+sns.set_style('white')
 
 def visualise_word_cloud(df, target_column):
     stopwords = set(STOPWORDS) # dataframe should already have stopwords removed, but worth checking no differences between wordcloud and nltk lists
@@ -12,3 +14,5 @@ def visualise_word_cloud(df, target_column):
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.show()
+
+

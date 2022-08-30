@@ -1,8 +1,10 @@
 import datetime
 from datetime import timedelta
+
+import numpy as np
 import requests
 import pandas as pd
-
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import config
 from classes.Preprocessor import Preprocessing
 from helpers.visualisations import visualise_word_cloud
@@ -11,7 +13,7 @@ MY_API_KEY = config.guardian_key
 API_ENDPOINT = config.guardian_endpoint
 
 my_params = {
-    'q': 'crypto, bitcoin, stocks, economy',
+    'q': 'crypto OR bitcoin',  # AND: "," OR: "|" NOT: "-"
     'from-date': "",
     'to-date': "",
     'order-by': "newest",
@@ -64,11 +66,28 @@ def create_df_from_dict(result_dict):
     return results_df
 
 
+def get_data(path_to_write):
+    start_date = datetime.date(2022, 1, 1)
+    end_date =datetime.date.today()
+    preprocessor = Preprocessing()
+    page_titles_dict = get_headlines(start_date, end_date, preprocessor)
+    results_df = create_df_from_dict(page_titles_dict)
+    results_df.to_csv(path_to_write, index=False)
+    return results_df
+
+def apply_sentiment_analysis(df, target_column):
+    sia_obj = SentimentIntensityAnalyzer()
+    df["compound_sent"] = [sia_obj.polarity_scores(x)['compound'] for x in df[target_column]]
+    conditions = [
+        (df["compound_sent"] > 0.05),
+        (df["compound_sent"] < -0.05),
+        (df["compound_sent"] <= 0.05) & (df["compound_sent"] >= -0.05)
+    ]
+    values = [1, -1, 0]  #  positive, negative, neutral sentiments
+    df["sentiment"] = np.select(conditions, values)
+    return df
 
 
-start_date = datetime.date(2020, 1, 1)
-end_date = datetime.date.today()
-preprocessor = Preprocessing()
-page_titles_dict = get_headlines(start_date, end_date, preprocessor)
-results_df = create_df_from_dict(page_titles_dict)
+results_df = pd.read_csv("data/news_headlines.csv")
 visualise_word_cloud(results_df, 'Headline')
+apply_sentiment_analysis(results_df, 'Headline')
