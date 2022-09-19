@@ -51,7 +51,6 @@ def get_headlines(start_date, end_date, pre_processor):
                 number_of_articles += 1
             # if there is more than one page of results
             current_page += 1
-
             total_pages = data['response']['pages']
         date_list = [date_string]
         all_dates.append(date_list * number_of_articles)
@@ -68,12 +67,13 @@ def create_df_from_dict(result_dict):
 
 def get_data(path_to_write):
     start_date = datetime.date(2022, 1, 1)
-    end_date =datetime.date.today()
+    end_date = datetime.date.today()
     preprocessor = Preprocessing()
     page_titles_dict = get_headlines(start_date, end_date, preprocessor)
     results_df = create_df_from_dict(page_titles_dict)
     results_df.to_csv(path_to_write, index=False)
     return results_df
+
 
 def apply_sentiment_analysis(df, target_column):
     sia_obj = SentimentIntensityAnalyzer()
@@ -83,11 +83,12 @@ def apply_sentiment_analysis(df, target_column):
         (df["compound_sent"] < -0.05),
         (df["compound_sent"] <= 0.05) & (df["compound_sent"] >= -0.05)
     ]
-    values = [1, -1, 0]  #  positive, negative, neutral sentiments
+    values = [1, -1, 0]  # positive, negative, neutral sentiments
     df["sentiment"] = np.select(conditions, values)
     return df
 
 
-results_df = pd.read_csv("data/news_headlines.csv")
+path = "../data/news_headlines.csv"
+results_df = pd.read_csv(path)
 visualise_word_cloud(results_df, 'Headline')
 apply_sentiment_analysis(results_df, 'Headline')

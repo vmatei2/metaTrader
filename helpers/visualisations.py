@@ -16,3 +16,12 @@ def visualise_word_cloud(df, target_column):
     plt.show()
 
 
+def plot_price_timeseries(price_df):
+    plt.figure(figsize=(10, 10))
+    plt.plot(price_df["Close"])
+    plt.xlabel("Days")
+    plt.ylabel("Closing price")
+    plt.show()
+
+price_df = pd.read_csv("../data/bitcoin_price_data.csv")
+plot_price_timeseries(price_df)
