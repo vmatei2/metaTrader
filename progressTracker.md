@@ -16,3 +16,15 @@ on the direction in which the price moved
   
 - Very important to find another data source, currently not enough information
     - Ask Humzah for the library we used in TTDS, could be very helpful
+  
+
+27th November:
+- Added visualisation of sentiment from all days based on summation
+- Have future ideas which need to be actioned
+- Looking into a Trello board so I can split up/pick up work as/when I have on time on this
+- Very interesting to see from the visualisation that most days at the moment group together around 
+-1,0,1
+  
+  - However, in the days which appear as outliers, we are more likely to see negative sentiment, rather than positive
+  - Can this be related to the Guardian/news outlets in general looking to dramaticise their headlines attempting to get clicks?
+  - Plus, what type of effect can this have on our data/future results? Interesting exploration areas
