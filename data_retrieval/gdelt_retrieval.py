@@ -30,15 +30,7 @@ def query_gdelt(date_list):
     return article_dict
 
 
-
 start_date = datetime.date(2022, 1, 1)
 end_date = datetime.date(2022, 10, 1)
 date_list = generate_spaced_entries(start_date, end_date)
 article_dict = query_gdelt(date_list)
-
-# Search for articles matching the filters
-articles = gd.article_search(f)
-# get a timeline of the number of articles matching the filters
-timeline = gd.timeline_search("timelinetone", f)
-
-breakhere = 0
