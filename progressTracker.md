@@ -36,3 +36,13 @@ on the direction in which the price moved
 - Very useful tool, also offering sentiment retreival
 - Interesting to couple this with our sentiment analysis and compare results
 - Retrieve for articles from start of 2022
+
+GDelt = supported by Google Jigsaw, the GDELT project monitors the world's broadcast
+print and web news from nearly every corner of every country in over 100 langauges
+and identifies the poeple, locations, orgs, themes, sources emotions, counts,
+quotes, images and events driving our global society every second of every day
+
+GDelt monitors the world's news media from nearly every corner of every country in print,
+broadcast and web formats, in over 100 languages, every moment of every day
+
+Its historical archive stretches back to Jan 1 1979 and updates every 15 mins
