@@ -28,3 +28,11 @@ on the direction in which the price moved
   - However, in the days which appear as outliers, we are more likely to see negative sentiment, rather than positive
   - Can this be related to the Guardian/news outlets in general looking to dramaticise their headlines attempting to get clicks?
   - Plus, what type of effect can this have on our data/future results? Interesting exploration areas
+  
+11th December
+
+- Connecting to GDELT api to retrieve news articles
+- Querying for Bitcoin articles atm
+- Very useful tool, also offering sentiment retreival
+- Interesting to couple this with our sentiment analysis and compare results
+- Retrieve for articles from start of 2022
