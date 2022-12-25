@@ -33,7 +33,7 @@ on the direction in which the price moved
 
 - Connecting to GDELT api to retrieve news articles
 - Querying for Bitcoin articles atm
-- Very useful tool, also offering sentiment retreival
+- Very useful tool, also offering sentiment retrieval
 - Interesting to couple this with our sentiment analysis and compare results
 - Retrieve for articles from start of 2022
 
@@ -45,4 +45,20 @@ quotes, images and events driving our global society every second of every day
 GDelt monitors the world's news media from nearly every corner of every country in print,
 broadcast and web formats, in over 100 languages, every moment of every day
 
-Its historical archive stretches back to Jan 1 1979 and updates every 15 mins
+Its historical archive stretches back to Jan 1 1979 and updates every 15 mins.
+
+25th December
+
+- Retrieving timeline tone from gdelt in hourly format
+- Extracting date from datetime time stamp and grouping average tone by date 
+- Plotting time series of average tone against time series of average price to see evolution
+
+Timelinetone simply represents a timeline of the average tone of the news coverage matching the filters provided.
+
+From GDelt doc: "Tone - allows you to filter only for aticles above or below a partiuclar tone
+score." 
+
+Fairly positive will have a tone>5, fairly negative<5.
+Going forward, plot tone evolution on its won, without normalising - to get an idea
+of how this looks. Extract price data, and think of an alpha-generating strategy off the back of this.
+Read 2 articles.
