@@ -9,7 +9,8 @@ from sklearn.preprocessing import normalize
 
 
 def visualise_word_cloud(df, target_column):
-    stopwords = set(STOPWORDS) # dataframe should already have stopwords removed, but worth checking no differences between wordcloud and nltk lists
+    stopwords = set(
+        STOPWORDS)  # dataframe should already have stopwords removed, but worth checking no differences between wordcloud and nltk lists
     text = " ".join(i for i in df[target_column])
     wordcloud = WordCloud(stopwords=stopwords, background_color="white").generate(text)
     plt.figure(figsize=(10, 10))
@@ -24,10 +25,11 @@ def plot_price_timeseries(price_df):
     plt.xlabel("Days")
     plt.ylabel("Closing price")
 
-def plot_price_sentiment_timeries(price_df, sentiment_df):
+
+def plot_price_sentiment_timeries(price_df, sentiment_df, target_column):
     plt.figure(figsize=(12, 10))
     norm_close = rescale_array(price_df["Close"])
-    norm_sentiment = rescale_array(sentiment_df["sentiment"])
+    norm_sentiment = rescale_array(sentiment_df[target_column])
     plt.plot(norm_close, 'r')
     plt.plot(norm_sentiment, "b-")
     plt.legend(["Bitcoin Price", "Overall sentiment"])
@@ -50,15 +52,31 @@ def bar_count_plot(sentiment_df):
         x = p.get_x() + p.get_width() / 2
         y = p.get_height()
         ax.annotate(y, (x, y), ha='center', va='center', fontsize=18, xytext=(0, 5), textcoords='offset points')
-    label_fontsize=18
+    label_fontsize = 18
     plt.xticks(fontsize=label_fontsize)
     plt.yticks(fontsize=label_fontsize)
     plt.show()
 
 
-sns.set_style("darkgrid")
-price_df = pd.read_csv("../data/bitcoin_price_data.csv")
-sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
-plot_price_sentiment_timeries(price_df, sentiment_df)
-bar_count_plot(sentiment_df)
-# plot_price_timeseries(price_df)
+
+def print_full_df(x):
+    """
+    Function used to simply print the full dataframe as saving and
+    loading from pickled df with the format returned by GDelt's timeline
+    search seems to cause issues
+    https://stackoverflow.com/questions/38956660/dataframe-not-showing-in-pycharm
+    :param x:
+    :return:
+    """
+    pd.set_option('display.max_rows', len(x))
+    print(x)
+    pd.reset_option('display.max_rows')
+
+if __name__ == '__main__':
+    sns.set_style("darkgrid")
+    price_df = pd.read_csv("../data/bitcoin_price_data.csv")
+    sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
+    timeline_df = pd.read_csv("../data/timeline_df_by_day.csv")
+    plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone")
+    bar_count_plot(sentiment_df)
+    # plot_price_timeseries(price_df)

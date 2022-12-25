@@ -1,8 +1,10 @@
 import datetime
-import json
 import pickle
 
+import pandas as pd
 from gdeltdoc import GdeltDoc, Filters
+from get_guardian_headlines import apply_sentiment_analysis, group_and_sum_sentiment_by_days
+from helpers.visualisations import print_full_df
 
 
 def generate_spaced_entries(start_date, end_date):
@@ -31,9 +33,11 @@ def query_gdelt(date_list):
                 end_date=end_date,
                 country=["UK", "US"]
             )
-            article_dict[start_date] = gd.article_search(filters=f)
-           # timeine_dict[date_list[i]] = gd.timeline_search("timelinetone", filters=f)
+            # article_dict[start_date] = gd.article_search(filters=f)
+            timeine_dict[date_list[i]] = gd.timeline_search("timelinetone", filters=f)
         save_dict("article_dict.txt", article_dict)
+    if timeine_dict:
+        save_dict("timeline_dict.txt", timeine_dict)
     return article_dict
 
 
@@ -52,4 +56,11 @@ end_date = datetime.date(2022, 10, 1)
 date_list = generate_spaced_entries(start_date, end_date)
 # article_dict = query_gdelt(date_list)
 article_dict = load_dict("article_dict.txt")
+timeline_dict = load_dict("timeline_dict.txt")
+for key, value in timeline_dict.items():
+    print_full_df(value)
+concat_timeline_df = pd.concat(timeline_dict.values())
+concat_timeline_df['Date'] = concat_timeline_df['datetime'].dt.date
+timeline_df_by_day = group_and_sum_sentiment_by_days(concat_timeline_df, "../data/timeline_df_by_day.csv", "Average Tone")
 test = 0
+

@@ -88,15 +88,16 @@ def apply_sentiment_analysis(df, target_column):
     return df
 
 
-def group_and_sum_sentiment_by_days(sentiment_df, write_path):
-    sentiment_df = sentiment_df.groupby("Date").sum("sentiment")
+def group_and_sum_sentiment_by_days(sentiment_df, write_path, column_name):
+    sentiment_df = sentiment_df.groupby("Date").sum(column_name)
     sentiment_df.to_csv(write_path, index=False)
     return sentiment_df
 
 
-path = "data/news_headlines.csv"
-results_df = pd.read_csv(path)
-visualise_word_cloud(results_df, 'Headline')
-results_df = apply_sentiment_analysis(results_df, 'Headline')
-group_and_sum_sentiment_by_days(results_df, "data/summed_sentiment.csv")
-stop = 0
+if __name__ == '__main__':
+    path = "../data/news_headlines.csv"
+    results_df = pd.read_csv(path)
+    visualise_word_cloud(results_df, 'Headline')
+    results_df = apply_sentiment_analysis(results_df, 'Headline')
+    group_and_sum_sentiment_by_days(results_df, "data/summed_sentiment.csv", "sentiment")
+    stop = 0
