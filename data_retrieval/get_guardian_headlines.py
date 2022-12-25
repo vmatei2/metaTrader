@@ -90,7 +90,7 @@ def apply_sentiment_analysis(df, target_column):
 
 def group_and_sum_sentiment_by_days(sentiment_df, write_path, column_name):
     sentiment_df = sentiment_df.groupby("Date").sum(column_name)
-    sentiment_df.to_csv(write_path, index=False)
+    sentiment_df.to_csv(write_path, index=True)
     return sentiment_df
 
 

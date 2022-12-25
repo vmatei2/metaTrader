@@ -26,14 +26,25 @@ def plot_price_timeseries(price_df):
     plt.ylabel("Closing price")
 
 
-def plot_price_sentiment_timeries(price_df, sentiment_df, target_column):
+def plot_sentiment_timeseries(sentiment_df, target_column, title):
+    plt.figure(figsize=(10, 10))
+    plt.plot(sentiment_df[target_column])
+    plt.xlabel("Days", fontsize=14)
+    plt.title(title, fontsize=18)
+    plt.ylabel("Sentiment/Tone Value", fontsize=14)
+    plt.show()
+
+
+def plot_price_sentiment_timeries(price_df, sentiment_df, target_column, title):
     plt.figure(figsize=(12, 10))
     norm_close = rescale_array(price_df["Close"])
     norm_sentiment = rescale_array(sentiment_df[target_column])
     plt.plot(norm_close, 'r')
     plt.plot(norm_sentiment, "b-")
-    plt.legend(["Bitcoin Price", "Overall sentiment"])
-    plt.xlabel("Days")
+    plt.legend(["Bitcoin Price", "Overall sentiment"], fontsize=12)
+    plt.xlabel("Days", fontsize=14)
+    plt.ylabel("Normalized values", fontsize=16)
+    plt.title(title, fontsize=18)
     plt.show()
 
 
@@ -44,10 +55,10 @@ def rescale_array(original_array):
     return scaled_array
 
 
-def bar_count_plot(sentiment_df):
+def bar_count_plot(sentiment_df, title, target_column):
     fig, ax = plt.subplots(figsize=(10, 10))
-    sns.countplot(x=sentiment_df["sentiment"], palette="rainbow_r")
-    plt.title("News sentiment extracted from the Guardian News grouped by total value for each day", fontsize=18)
+    sns.countplot(x=sentiment_df[target_column], palette="rainbow_r")
+    plt.title(title, fontsize=18)
     for p in ax.patches:
         x = p.get_x() + p.get_width() / 2
         y = p.get_height()
@@ -72,11 +83,28 @@ def print_full_df(x):
     print(x)
     pd.reset_option('display.max_rows')
 
+
+def two_by_one_plot(price_df, sentiment_df, target_column):
+    fig, axs = plt.subplots(2)
+    fig.suptitle("Plotting price time series and average tone evolution")
+    axs[0].plot(price_df["Close"], 'r')
+    axs[0].set_title("Bitcoin price evolution")
+    axs[0].set_xlabel("Day")
+    axs[0].set_ylabel("Price")
+    axs[1].plot(sentiment_df[target_column])
+    axs[1].set_title("Average tone from bitcoin related media")
+    axs[1].set_ylabel("Tone value")
+    fig.tight_layout()
+    plt.show()
+
 if __name__ == '__main__':
     sns.set_style("darkgrid")
     price_df = pd.read_csv("../data/bitcoin_price_data.csv")
     sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
-    timeline_df = pd.read_csv("../data/timeline_df_by_day.csv")
-    plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone")
-    bar_count_plot(sentiment_df)
+    timeline_df = pd.read_csv("../data/timeline_df_by_day.csv", index_col=0)
+    plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone", "Normalized sentiment and price values")
+    bar_count_plot(sentiment_df, "News sentiment grouped by day - extracted from the Guardian", "sentiment")
     # plot_price_timeseries(price_df)
+    plot_sentiment_timeseries(timeline_df, "Average Tone", "Average Tone over analysed days")
+    two_by_one_plot(price_df, timeline_df, "Average Tone")
+    print("Correlation between the two arrays is: ")
