@@ -108,3 +108,7 @@ if __name__ == '__main__':
     plot_sentiment_timeseries(timeline_df, "Average Tone", "Average Tone over analysed days")
     two_by_one_plot(price_df, timeline_df, "Average Tone")
     print("Correlation between the two arrays is: ")
+    timeline_tone_series = timeline_df["Average Tone"]
+    price_series = price_df['Close']
+    print(np.corrcoef(timeline_tone_series, price_series))
+    stop = 0
