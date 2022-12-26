@@ -11,8 +11,4 @@ def retrieve_bitcoin_data(symbol, start_date, end_date, write_path):
     return bitcoin_price_df
 
 
-symbol = "BTC"
-start_date = "01-01-2022"
-end_date = datetime.date.today().strftime("%d-%m-%Y")
-bitcoin_price_df = retrieve_bitcoin_data(symbol, start_date, end_date, write_path="../data/bitcoin_price_data.csv")
 

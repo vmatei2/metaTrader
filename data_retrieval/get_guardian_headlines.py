@@ -7,7 +7,7 @@ import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import config
 from classes.Preprocessor import Preprocessing
-from helpers.visualisations import visualise_word_cloud
+from helpers.analysis import visualise_word_cloud
 
 MY_API_KEY = config.guardian_key
 API_ENDPOINT = config.guardian_endpoint

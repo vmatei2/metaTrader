@@ -30,11 +30,14 @@ def plot_price_timeseries(price_df):
 
 
 def plot_sentiment_timeseries(sentiment_df, target_column, title):
-    plt.figure(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(14, 10))
     plt.plot(sentiment_df[target_column])
     plt.xlabel("Days", fontsize=14)
     plt.title(title, fontsize=18)
     plt.ylabel("Sentiment/Tone Value", fontsize=14)
+    n = 14 # keep every nth label
+    [l.set_visible(False) for (i,l) in enumerate(ax.xaxis.get_ticklabels()) if i % n != 0]
+    plt.xticks(rotation=45)
     plt.show()
 
 
@@ -72,7 +75,6 @@ def bar_count_plot(sentiment_df, title, target_column):
     plt.show()
 
 
-
 def print_full_df(x):
     """
     Function used to simply print the full dataframe as saving and
@@ -87,33 +89,54 @@ def print_full_df(x):
     pd.reset_option('display.max_rows')
 
 
-def two_by_one_plot(price_df, sentiment_df, target_column):
-    fig, axs = plt.subplots(2)
-    fig.suptitle("Plotting price time series and average tone evolution")
+def show_subplots(price_df, sentiment_df, target_column):
+    fig, axs = plt.subplots(3, figsize=(16, 18))
+    fig.suptitle("Plotting price time series and average tone evolution", fontsize=16)
+    ylabel_fontsize=14
+    title_fontsize=15
     axs[0].plot(price_df["Close"], 'r')
-    axs[0].set_title("Bitcoin price evolution")
+    axs[0].set_title("Bitcoin price evolution", fontsize=title_fontsize)
     axs[0].set_xlabel("Day")
-    axs[0].set_ylabel("Price")
+    n = 14 # show every nth label xaxis
+    prepare_axis(axs[0], n)
+    axs[0].set_ylabel("Price", fontsize=ylabel_fontsize)
     axs[1].plot(sentiment_df[target_column])
-    axs[1].set_title("Average tone from bitcoin related media")
-    axs[1].set_ylabel("Tone value")
+    axs[1].set_title("Average tone from bitcoin related media", fontsize=title_fontsize)
+    axs[1].set_ylabel("Tone value", fontsize=ylabel_fontsize)
+    prepare_axis(axs[1], n)
+    axs[2].plot(price_df["Returns"], 'y')
+    axs[2].set_title("Bitcoin returns")
+    axs[2].set_ylabel("Returns %", fontsize=ylabel_fontsize)
+    prepare_axis(axs[2], n)
     fig.tight_layout()
     plt.show()
 
-if __name__ == '__main__':
-    sns.set_style("darkgrid")
-    preprocessor = Preprocessing()
-    price_df = pd.read_csv("../data/bitcoin_price_data.csv", index_col=0)
-    sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
-    timeline_df = pd.read_csv("../data/timeline_df_by_day.csv", index_col=0)
-    plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone", "Normalized sentiment and price values")
-    bar_count_plot(sentiment_df, "News sentiment grouped by day - extracted from the Guardian", "sentiment")
-    # plot_price_timeseries(price_df)
-    plot_sentiment_timeseries(timeline_df, "Average Tone", "Average Tone over analysed days")
-    two_by_one_plot(price_df, timeline_df, "Average Tone")
-    print("Correlation between the two arrays is: ")
+
+def prepare_axis(axis_obj, n):
+    for index, label in enumerate(axis_obj.xaxis.get_ticklabels()):
+        label.set_rotation(50)
+        if index % n != 0:
+            label.set_visible(False)
+
+def returns_correlation(price_df, timeline_df, preprocessor):
     timeline_tone_series = timeline_df["Average Tone"]
     price_df = preprocessor.create_returns_column(price_df)
     price_series = price_df["Returns"]
+    print("Correlation coefficient is: ")
     print(np.corrcoef(timeline_tone_series, price_series))
-    stop = 0
+
+
+def main(price_df, timeline_df, preprocessor, sentiment_df=None):
+    sns.set_style("darkgrid")
+    returns_correlation(price_df, timeline_df, preprocessor)
+    plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone", "Normalized sentiment and price values")
+    if sentiment_df:
+        bar_count_plot(sentiment_df, "News sentiment grouped by day - extracted from the Guardian", "sentiment")
+    # plot_price_timeseries(price_df)
+    plot_sentiment_timeseries(timeline_df, "Average Tone", "Average Tone over analysed days")
+    show_subplots(price_df, timeline_df, "Average Tone")
+
+
+
+if __name__ == '__main__':
+    main()

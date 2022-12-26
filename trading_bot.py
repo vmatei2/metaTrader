@@ -1,5 +1,4 @@
 import time
-
 import ccxt
 import numpy as np
 import pandas as pd
@@ -8,7 +7,6 @@ from datetime import datetime
 import config
 
 CANDLE_DURATION_IN_MIN = 5
-
 RSI_PERIOD = 15
 RSI_OVERBOUGHT = 70
 RSI_OVERSOLD = 30
@@ -34,7 +32,6 @@ def fetch_data(ticker):
         bars = kraken.fetch_ohlcv(ticker, timeframe=f"{CANDLE_DURATION_IN_MIN}m", limit=100)
     except:
         print(f"Error in fetching data from the exchange:{ticker}")
-
     if bars is not None:
         ticker_df = pd.DataFrame(bars[:-1], columns=['at', 'open', 'high', 'low', 'close', 'vol'])
         ticker_df['Date'] = pd.to_datetime(ticker_df['at'], unit='ms')
@@ -46,7 +43,6 @@ def fetch_data(ticker):
 # trading decision
 def get_trade_recommendation(ticker_df):
     macd_result, final_result = 'WAIT', 'WAIT'
-
     # BUY or SELL based on MACD crossover points and the RSI value at that point
     macd, signal, hist = talib.MACD(ticker_df['close'], fastperiod=12, slowperiod=26, signalperiod=9)
     last_hist = hist.iloc[-1]
@@ -56,12 +52,10 @@ def get_trade_recommendation(ticker_df):
         macd_crossover = (abs(last_hist + prev_hist)) != (abs(last_hist) + abs(prev_hist))
         if macd_crossover:
             macd_result = 'BUY' if last_hist > 0 else 'SELL'
-
         if macd_result != 'WAIT':
             rsi = talib.RSI(ticker_df['close'], timeperiod=14)
             # Consider the last 3 RSI values
             last_rsi_values = rsi.iloc[-3:]
-
             if (last_rsi_values.min() <= RSI_OVERSOLD):
                 final_result = 'BUY'
             elif (last_rsi_values.max() >= RSI_OVERBOUGHT):
