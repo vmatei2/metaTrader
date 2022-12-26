@@ -62,3 +62,20 @@ Fairly positive will have a tone>5, fairly negative<5.
 Going forward, plot tone evolution on its won, without normalising - to get an idea
 of how this looks. Extract price data, and think of an alpha-generating strategy off the back of this.
 Read 2 articles.
+
+
+26th December
+- Big update to design
+- One main controller class, which firstly checks if we have the data
+- If we do, then simply load it, otherwise retrieve it
+- Following this, the work will be performed by the separate files,
+which the controller then simply calls to operate
+  
+- Looking into how returns correlate with the tone from news
+- Also read a very interesting paper --> "Do news headline matter in the cryptocurrency market?"
+  
+   - positive news sentiment leads to increase in crypto returns
+  - Significant positive impact of volume on returns
+  - S&P 500 Index Returns have a significant positive impact on crypto 
+  returns
+  - Crypto may have a delayed response to news --> create cumulative score with exponential adaptation
