@@ -26,7 +26,11 @@ def query_gdelt(date_list):
         # gdelt api (250 returns)
         if i % 7 == 0:
             start_date = str(date_list[i])
-            end_date = str(date_list[i + 6])
+            if (i+6 > len(date_list)):
+                end_date = str(date_list[-1])  # if the date goes out of bounds, then simply get from now up until max
+                # point of the date list
+            else:
+                end_date = str(date_list[i + 6])
             f = Filters(
                 keyword="bitcoin",
                 start_date=start_date,
@@ -52,10 +56,10 @@ def load_dict(filepath):
     return article_dict
 
 start_date = datetime.date(2022, 1, 1)
-end_date = datetime.date(2022, 10, 1)
+end_date = datetime.date.today()
 date_list = generate_spaced_entries(start_date, end_date)
-# article_dict = query_gdelt(date_list)
-article_dict = load_dict("article_dict.txt")
+article_dict = query_gdelt(date_list)
+#article_dict = load_dict("article_dict.txt")
 timeline_dict = load_dict("timeline_dict.txt")
 for key, value in timeline_dict.items():
     print_full_df(value)

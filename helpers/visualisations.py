@@ -99,7 +99,7 @@ def two_by_one_plot(price_df, sentiment_df, target_column):
 
 if __name__ == '__main__':
     sns.set_style("darkgrid")
-    price_df = pd.read_csv("../data/bitcoin_price_data.csv")
+    price_df = pd.read_csv("../data/bitcoin_price_data.csv", index_col=0)
     sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
     timeline_df = pd.read_csv("../data/timeline_df_by_day.csv", index_col=0)
     plot_price_sentiment_timeries(price_df, timeline_df, "Average Tone", "Normalized sentiment and price values")
