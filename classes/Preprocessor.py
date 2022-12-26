@@ -15,3 +15,8 @@ class Preprocessing:
         removed_stopwords_list = [w for w in word_tokens if not w in self.stopwords_en]
         removed_stopwords_string = ' '.join(removed_stopwords_list)
         return removed_stopwords_string
+
+    def create_returns_column(self, df):
+        days_lookback = 1
+        df['Returns'] = df['Close'].pct_change(days_lookback)
+        return df

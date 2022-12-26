@@ -7,6 +7,9 @@ import pandas as pd
 import seaborn as sns
 from sklearn.preprocessing import normalize
 
+from classes import Preprocessor
+from classes.Preprocessor import Preprocessing
+
 
 def visualise_word_cloud(df, target_column):
     stopwords = set(
@@ -99,6 +102,7 @@ def two_by_one_plot(price_df, sentiment_df, target_column):
 
 if __name__ == '__main__':
     sns.set_style("darkgrid")
+    preprocessor = Preprocessing()
     price_df = pd.read_csv("../data/bitcoin_price_data.csv", index_col=0)
     sentiment_df = pd.read_csv("../data/summed_sentiment.csv")
     timeline_df = pd.read_csv("../data/timeline_df_by_day.csv", index_col=0)
@@ -109,6 +113,7 @@ if __name__ == '__main__':
     two_by_one_plot(price_df, timeline_df, "Average Tone")
     print("Correlation between the two arrays is: ")
     timeline_tone_series = timeline_df["Average Tone"]
-    price_series = price_df['Close']
+    price_df = preprocessor.create_returns_column(price_df)
+    price_series = price_df["Returns"]
     print(np.corrcoef(timeline_tone_series, price_series))
     stop = 0
