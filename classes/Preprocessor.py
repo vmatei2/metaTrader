@@ -16,7 +16,7 @@ class Preprocessing:
         removed_stopwords_string = ' '.join(removed_stopwords_list)
         return removed_stopwords_string
 
-    def create_returns_column(self, df):
+    def create_returns_column(self, df, target_column):
         days_lookback = 1
-        df['Returns'] = df['Close'].pct_change(days_lookback)
+        df['Returns'] = df[target_column].pct_change(days_lookback)
         return df

@@ -56,6 +56,11 @@ def plot_price_sentiment_timeries(price_df, sentiment_df, target_column, title):
 
 def rescale_array(original_array):
     max = np.max(original_array)
+    if max == float('inf'):
+        array_sorted = np.sort(original_array)
+        max = array_sorted[-3]  # the array after sorting has an inf and nan, therefore -3 is the first actual max
+        # value we have
+
     min = np.min(original_array)
     scaled_array = np.array([(x - min) / (max - min) for x in original_array])
     return scaled_array
@@ -104,9 +109,13 @@ def show_subplots(price_df, sentiment_df, target_column):
     axs[1].set_title("Average tone from bitcoin related media", fontsize=title_fontsize)
     axs[1].set_ylabel("Tone value", fontsize=ylabel_fontsize)
     prepare_axis(axs[1], n)
-    axs[2].plot(price_df["Returns"], 'y')
-    axs[2].set_title("Bitcoin returns")
-    axs[2].set_ylabel("Returns %", fontsize=ylabel_fontsize)
+
+    normalized_bitcoin_returns = rescale_array(price_df["Returns"])
+    normalized_sentiment_tone = rescale_array(sentiment_df["Returns"])
+    axs[2].plot(normalized_bitcoin_returns, 'y')
+    axs[2].plot(normalized_sentiment_tone, 'g')
+    axs[2].set_title("Bitcoin and sentiment pct changes")
+    axs[2].set_ylabel("Pct changes %", fontsize=ylabel_fontsize)
     prepare_axis(axs[2], n)
     fig.tight_layout()
     plt.show()
@@ -120,9 +129,12 @@ def prepare_axis(axis_obj, n):
 
 def returns_correlation(price_df, timeline_df, preprocessor):
     timeline_tone_series = timeline_df["Average Tone"]
-    price_df = preprocessor.create_returns_column(price_df)
+    price_df = preprocessor.create_returns_column(price_df, "Close")
     price_series = price_df["Returns"]
     print("Correlation coefficient is: ")
+    timeline_df = preprocessor.create_returns_column(timeline_df, "Average Tone")
+    timeline_tone_series = timeline_df["Returns"]
+
     print(np.corrcoef(timeline_tone_series, price_series))
 
 
