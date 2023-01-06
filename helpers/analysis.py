@@ -112,11 +112,12 @@ def show_subplots(price_df, sentiment_df, target_column):
 
     normalized_bitcoin_returns = rescale_array(price_df["Returns"])
     normalized_sentiment_tone = rescale_array(sentiment_df["Returns"])
-    axs[2].plot(normalized_bitcoin_returns, 'y')
-    axs[2].plot(normalized_sentiment_tone, 'g')
+    axs[2].plot(price_df.index, normalized_bitcoin_returns, 'y', label="Normalized bitcoin returns")
+    axs[2].plot(price_df.index, normalized_sentiment_tone, 'g', label="Normalized sentiment tone pct changes")
     axs[2].set_title("Bitcoin and sentiment pct changes")
     axs[2].set_ylabel("Pct changes %", fontsize=ylabel_fontsize)
     prepare_axis(axs[2], n)
+    plt.legend(fontsize=14)
     fig.tight_layout()
     plt.show()
 
